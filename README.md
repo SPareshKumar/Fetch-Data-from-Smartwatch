@@ -1,1 +1,3 @@
 # Retrieve-Data-from-Smartwatch
+Fetches Heart Rate from smartwatches which work on Wear OS. 
+This data can be used to store in a database and then further be used to implement a Real-Time Health Monitoring Website.
