@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Health Manager</string>
+    <string name="hello_wear_os">Hello Wear OS!</string>
+</resources>
