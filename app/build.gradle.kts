@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.healthmanager"
-        minSdk = 21
-        targetSdk = 33
+        minSdk = 23
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
@@ -32,6 +32,9 @@ dependencies {
     implementation(libs.retrofit)
     // Converter for JSON
     implementation(libs.converter.gson)
+    implementation(libs.play.services.wearable.v1700)
+    implementation(libs.wear)
+    implementation (libs.core)
     // Add other dependencies as needed
 }
 
