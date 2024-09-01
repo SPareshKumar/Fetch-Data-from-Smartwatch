@@ -29,6 +29,9 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(libs.appcompat)
     implementation(libs.appcompat)
+    implementation(libs.retrofit)
+    // Converter for JSON
+    implementation(libs.converter.gson)
     // Add other dependencies as needed
 }
 

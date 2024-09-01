@@ -14,22 +14,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 1001;
     private SensorManager sensorManager;
     private Sensor heartRateSensor;
     private SensorEventListener heartRateListener;
+    private ApiService apiService;  // Retrofit API service
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize Retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://10.0.2.2:5000/")  // Replace with your server's IP or URL
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        apiService = retrofit.create(ApiService.class);
+
         // Initialize the sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        // Initialize heart rate sensor
+        // Initialize the heart rate sensor
         heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
 
         // Create a sensor event listener
@@ -37,9 +52,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_HEART_RATE) {
-                    float heartRate = event.values[0]; // Get heart rate value
-                    Log.d("HeartRate", "Heart Rate: " + heartRate); // Display in logs
-                    // Send the heart rate to the server here
+                    float heartRate = event.values[0];  // Get heart rate value
+                    Log.d("HeartRate", "Heart Rate: " + heartRate);  // Display in logs
+
+                    // Create heart rate data object
+                    HeartRateData heartRateData = new HeartRateData(heartRate);
+
+                    // Send the heart rate data to the server
+                    apiService.sendHeartRate(heartRateData).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                Log.d("API", "Data sent successfully");
+                            } else {
+                                Log.d("API", "Failed to send data: " + response.code());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Log.d("API", "Error sending data", t);
+                        }
+                    });
                 }
             }
 
@@ -51,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Check and request permission
         if (isPermissionGranted()) {
-            // Start sensor access
             startHeartRateMonitoring();
         } else {
             requestPermission();
